@@ -1,5 +1,5 @@
 # -*- coding: cp1251 -*-
-# Следующая строка кодирует файл, для правильной работы с кириллицей. cp1251 Это кодировка Windows(кириллица)
+# Предыдущая трока кодирует файл, для правильной работы с кириллицей. cp1251 Это кодировка Windows(кириллица)
 import csv
 
 # Этот список ключей заголовков парсировоного файла, которые в процессе будут удаленны
@@ -20,11 +20,13 @@ dict_new = {'RecType': 'Fact', 'assignmentFactUuid': None, 'LMSZID': 'feac0762-4
             'criteriaCode': None, 'FormCode': str('01'), 'amount': None, 'measuryCode': '01', 'monetization': str('Нет'),
             'content': None, 'comment': None, 'equivalentAmount': None}
 
+# Пустой список, если ошибок нет для обработки ошибок
+surname_donor = []
 
-print("Введите название файла вместе с РАСШИРЕНИЕМ .csv ")
-print("Пример: aist26.02.csv")
+print("Введите название файла csv, выгруженный из ЕИБД АИСТ")
+print("Пример: aist")
 # Название файла который необходимо открыть
-Aist_file = input("Название файла:")
+Aist_file = input("Название файла:")+str(".csv")
 try:
     # Открываем парсируемый файл
     with open(Aist_file, newline='') as file:
@@ -46,7 +48,17 @@ try:
             # Записываем заголовки в csv файл
             writer.writeheader()
             # Начинаем считывать строки из парсированого файла
+
             for line in reader:
+                # Проверка столбца - кем выдан паспорт
+                str_doc_Issuer_recip = line['doc_Issuer_recip']
+                if (len(str_doc_Issuer_recip)) == 0:
+                    writer.writerow(line)
+                    print("Отсутствует информация, кем выдан паспорт:")
+                    surname_donor =  line['FamilyName_recip'] + "".join(' ') + line['Name_recip'] + "".join(' ') \
+                                     + line['Patronymic_recip'] + "".join(' ') + line['BirthDate_recip']
+                    print(surname_donor)
+                    print()
                 # Приводим данные из файла к нужному формату
                 # Удаляем из парсировоного файла лишние ключи (заголовки)
                 for names in ignore:
@@ -78,6 +90,12 @@ try:
                 a = {**dict_new, **line}
                 # Записываем объединенный словарь в csv файл
                 writer.writerow(a)
+
+
+    # Оставляем консоль открытой в случае ошибки
+    if len(surname_donor) > 0:
+        print("Проверьте корректность данных донора(ов)")
+        input('')
 
 except BaseException as errors:
     print(errors)
