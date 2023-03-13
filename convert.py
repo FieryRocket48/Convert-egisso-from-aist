@@ -53,7 +53,6 @@ try:
                 # Проверка столбца - кем выдан паспорт
                 str_doc_Issuer_recip = line['doc_Issuer_recip']
                 if (len(str_doc_Issuer_recip)) == 0:
-                    writer.writerow(line)
                     print("Отсутствует информация, кем выдан паспорт:")
                     surname_donor =  line['FamilyName_recip'] + "".join(' ') + line['Name_recip'] + "".join(' ') \
                                      + line['Patronymic_recip'] + "".join(' ') + line['BirthDate_recip']
